@@ -69,11 +69,19 @@ function TradingCardContainer() {
 
   const [cards, setCards] = React.useState([]);
 
-  React.useEffect(() => {
-    fetch('/cards.json')
-    .then((response) => response.json())
-    .then((result) => setCards(result.cards))
-  }, [])
+  //  FURTHER STUDY ADDED CODE
+  function addCard(newCard) {
+    // [...cards] makes a copy of cards. Similar to currentCards = cards[:] in Python
+    const currentCards = [...cards];
+    // [...currentCards, newCard] is an array containing all elements in currentCards followed by newCard
+    setCards([...currentCards, newCard]);
+  }
+
+   React.useEffect(() => {
+     fetch('/cards.json')
+     .then((response) => response.json())
+     .then((result) => setCards(result.cards))
+   }, []) // empty array -> runs only on first render, [cards] -> renders every time cards is updated
   
   const tradingCards = [];
 
@@ -88,14 +96,18 @@ function TradingCardContainer() {
     );
   }
 
+  // return (
+  //   <div className="grid">{tradingCards}</div>
+  // );
+
   return (
     <React.Fragment>
-      <AddTradingCard />
+      <AddTradingCard addCard={addCard} />
       <h2>Trading Cards</h2>
       <div className="grid">{tradingCards}</div>
     </React.Fragment>
   );
-}
+ }
 
 ReactDOM.render(<TradingCardContainer />, document.getElementById('container'));
 
@@ -115,7 +127,11 @@ function AddTradingCard(props) {
     })
       .then((response) => response.json())
       .then((jsonResponse) => {
-        alert(`Card added! Response: ${jsonResponse}`)
+        // alert(`Card added! Response: ${jsonResponse.cardAdded.name} Object`)
+        // this could also be written as const cardAdded = { jsonResponse } using
+        // Javascript destructuring
+        const cardAdded = jsonResponse.cardAdded;
+        props.addCard(cardAdded);
       });
   }
   
